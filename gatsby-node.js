@@ -207,39 +207,77 @@ exports.createPages = ({ actions, graphql }) => {
       })
     })
     
-    .then(result => {
-      // 下記があるとerrosのundefinedでエラーとなる。原因はまだ分かってない。
-      // if (result.errors) {
-      //   result.errors.forEach(e => console.error(e.toString()))
-      //   return Promise.reject(result.errors)
-      // }
+    // .then(result => {
+    //   // 下記があるとerrosのundefinedでエラーとなる。原因はまだ分かってない。
+    //   // if (result.errors) {
+    //   //   result.errors.forEach(e => console.error(e.toString()))
+    //   //   return Promise.reject(result.errors)
+    //   // }
 
-      const blogs = [
+    //   const blogs = [
+    //     {
+    //       path: "blogs/1",
+    //       date: "2019/02/16",
+    //       title: "My first blog post"
+    //     },
+    //     {
+    //       path: "blogs/2",
+    //       date: "2019/02/16",
+    //       title: "My second  blog post"
+    //     }
+    //   ];
+
+    //   blogs.forEach(blog =>
+    //     createPage({
+    //       path: blog.path,
+    //       component: path.resolve(`./src/templates/blog-template.js`),
+    //       context: {
+    //         path: blog.path,
+    //         date: blog.date,
+    //         title: blog.title
+    //       },
+    //     })
+    //   );
+    //   // resolve();
+    // });
+    .then(() => {
+      return graphql(`
         {
-          path: "blogs/1",
-          date: "2019/02/16",
-          title: "My first blog post"
-        },
-        {
-          path: "blogs/2",
-          date: "2019/02/16",
-          title: "My second  blog post"
+          allMarkdownRemark(
+            sort: { order: DESC, fields: [frontmatter___date] }
+            limit: 1000
+          ) {
+            edges {
+              node {
+                frontmatter {
+                  path
+                  date
+                  title
+                }
+              }
+            }
+          }
         }
-      ];
+      `)
+    })
+    .then(result => {
+      if (result.errors) {
+        result.errors.forEach(e => console.error(e.toString()))
+        return Promise.reject(result.errors)
+      }
 
-      blogs.forEach(blog =>
+      result.data.allMarkdownRemark.edges.forEach(({ node }) => {
         createPage({
-          path: blog.path,
-          component: path.resolve(`./src/templates/blog-template.js`),
+          path: node.frontmatter.path,
+          component: path.resolve(`src/templates/blog-template.js`),
           context: {
-            path: blog.path,
-            date: blog.date,
-            title: blog.title
-          },
+            path: node.frontmatter.path,
+            // date: node.frontmatter.date,
+            // title: node.frontmatter.title,
+          }
         })
-      );
-      // resolve();
-    });
+      })
+    })
 }
 
 exports.onCreateNode = ({ node, actions, getNode }) => {

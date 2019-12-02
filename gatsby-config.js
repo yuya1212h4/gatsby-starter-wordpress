@@ -34,5 +34,14 @@ module.exports = {
       },
     }, // must be after other CSS plugins
     'gatsby-plugin-netlify', // make sure to keep it last in the array
+    
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/src/markdowns`,
+        name: "markdown-pages",
+      }
+    },
+    `gatsby-transformer-remark`,
   ],
 }
