@@ -7,8 +7,8 @@ const getOnlyPublished = edges =>
   _.filter(edges, ({ node }) => node.status === 'publish')
 
 exports.createPages = ({ actions, graphql }) => {
-  const { createPage } = actions
-
+  const { createPage } = actions;
+  
   return graphql(`
     {
       allWordpressPage {
@@ -206,6 +206,40 @@ exports.createPages = ({ actions, graphql }) => {
         })
       })
     })
+    
+    .then(result => {
+      // 下記があるとerrosのundefinedでエラーとなる。原因はまだ分かってない。
+      // if (result.errors) {
+      //   result.errors.forEach(e => console.error(e.toString()))
+      //   return Promise.reject(result.errors)
+      // }
+
+      const blogs = [
+        {
+          path: "blogs/1",
+          date: "2019/02/16",
+          title: "My first blog post"
+        },
+        {
+          path: "blogs/2",
+          date: "2019/02/16",
+          title: "My second  blog post"
+        }
+      ];
+
+      blogs.forEach(blog =>
+        createPage({
+          path: blog.path,
+          component: path.resolve(`./src/templates/blog-template.js`),
+          context: {
+            path: blog.path,
+            date: blog.date,
+            title: blog.title
+          },
+        })
+      );
+      // resolve();
+    });
 }
 
 exports.onCreateNode = ({ node, actions, getNode }) => {
