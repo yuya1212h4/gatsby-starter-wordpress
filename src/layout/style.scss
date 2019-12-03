@@ -1,0 +1,12 @@
+.Header {
+  background-color: blue
+}
+
+.Scroll__box {
+  height: 150vh;
+  width: 20vw;
+  background-color: pink;
+  &__text {
+    position: fixed;
+  }
+}
